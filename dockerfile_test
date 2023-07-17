@@ -1,0 +1,37 @@
+# dockerfile_test
+# use to build the package and test
+# build command: docker build -f dockerfile_test -t test .
+
+ARG PACKAGE_PRETEND_VERSION=0.0.0
+
+#=========================
+FROM buster:python-3.7.13 as compiler
+ARG PACKAGE_PRETEND_VERSION
+
+WORKDIR /opt
+
+RUN ldd --version
+
+RUN pip install --no-cache -U --force-reinstall "https://github.com/Nuitka/Nuitka/archive/factory.zip"
+RUN python3 -m nuitka --version
+
+
+# Build sdist from the package source
+COPY ./python .
+RUN SETUPTOOLS_SCM_PRETEND_VERSION=${PACKAGE_PRETEND_VERSION} python3 setup.py sdist bdist_wheel
+
+
+#=========================
+FROM buster:python-3.7.3
+
+WORKDIR /opt
+
+RUN ldd --version
+
+RUN apt-get update && apt install -y gdb python3.7-dbg
+
+# Copy the previously built package
+COPY --from=compiler /opt/dist/*.tar.gz ./
+
+# Install the previously built package
+RUN pip3 install --no-deps ./*.tar.gz

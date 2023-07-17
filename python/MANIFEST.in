@@ -1,0 +1,5 @@
+global-include *.so *.pyi
+global-exclude *.py
+include setup.py
+include mypackage/demo/__init__.py
+include mypackage/demo/__main__.py
