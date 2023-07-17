@@ -12,7 +12,9 @@ WORKDIR /opt
 
 RUN ldd --version
 
-RUN pip install --no-cache -U --force-reinstall "https://github.com/Nuitka/Nuitka/archive/factory.zip"
+RUN apt-get update && apt install -y git
+# RUN pip install --no-cache -U --force-reinstall "https://github.com/Nuitka/Nuitka/archive/factory.zip"
+RUN git clone --branch factory https://github.com/Nuitka/Nuitka.git && cd Nuitka && pip install .
 RUN python3 -m nuitka --version
 
 
